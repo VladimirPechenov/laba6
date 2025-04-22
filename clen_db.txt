@@ -1,0 +1,197 @@
+-- 1. Создание базы данных
+CREATE DATABASE IF NOT EXISTS inventory_db;
+USE inventory_db;
+-- 2. Создание таблицы Brand
+CREATE TABLE Brand (
+    brand_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    country VARCHAR(100),
+    description TEXT
+);
+-- 3. Создание таблицы Category
+CREATE TABLE Category (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT
+);
+-- 4. Создание таблицы Warehouse
+CREATE TABLE Warehouse (
+    warehouse_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    telephone VARCHAR(20),
+    contact_face VARCHAR(255),
+    address TEXT
+);
+-- 5. Создание таблицы Supplier
+CREATE TABLE Supplier (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    email VARCHAR(255),
+    phone_number VARCHAR(20),
+    contact_face VARCHAR(255)
+);
+-- 6. Создание таблицы Supply
+CREATE TABLE Supply (
+    supply_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    status ENUM('pending', 'completed', 'cancelled') NOT NULL,
+    warehouse_id INT,
+    supplier_id INT,
+    FOREIGN KEY (warehouse_id) REFERENCES Warehouse(warehouse_id) ON DELETE SET NULL,
+    FOREIGN KEY (supplier_id) REFERENCES Supplier(supplier_id) ON DELETE SET NULL
+);
+-- 7. Создание таблицы Product
+CREATE TABLE Product (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    description TEXT,
+    availability BOOLEAN DEFAULT TRUE,
+    name VARCHAR(255) NOT NULL,
+    date_of_addition DATE,
+    remaining_stock INT DEFAULT 0,
+    brand_id INT,
+    category_id INT,
+    supply_id INT,
+    warehouse_id INT,
+    FOREIGN KEY (brand_id) REFERENCES Brand(brand_id) ON DELETE SET NULL,
+    FOREIGN KEY (category_id) REFERENCES Category(category_id) ON DELETE SET NULL,
+    FOREIGN KEY (supply_id) REFERENCES Supply(supply_id) ON DELETE SET NULL,
+    FOREIGN KEY (warehouse_id) REFERENCES Warehouse(warehouse_id) ON DELETE SET NULL
+);
+-- 8. Создание таблицы Client
+CREATE TABLE Client (
+    client_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    surname VARCHAR(255) NOT NULL,
+    address TEXT,
+    telephone VARCHAR(20),
+    email VARCHAR(255)
+);
+
+-- 9. Создание таблицы Details
+CREATE TABLE Details (
+    details_id INT AUTO_INCREMENT PRIMARY KEY,
+    price DECIMAL(10,2) NOT NULL,
+    amount INT NOT NULL
+);
+-- 10. Создание таблицы OrderTable
+CREATE TABLE OrderTable (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    status ENUM('pending', 'shipped', 'delivered', 'cancelled') NOT NULL,
+    client_id INT,
+    details_id INT,
+    product_id INT,
+    FOREIGN KEY (client_id) REFERENCES Client(client_id) ON DELETE CASCADE,
+    FOREIGN KEY (details_id) REFERENCES Details(details_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
+);
+-- Вставка данных в таблицу Brand
+INSERT INTO Brand (name, country, description) VALUES
+('Fender', 'USA', 'Легендарный производитель гитар и бас-гитар.'),
+('Gibson', 'USA', 'Известный бренд акустических и электрогитар.'),
+('Yamaha', 'Japan', 'Производитель музыкальных инструментов и оборудования.'),
+('Ibanez', 'Japan', 'Популярный бренд электрогитар и бас-гитар.'),
+('Roland', 'Japan', 'Производитель синтезаторов и электронных инструментов.'),
+('Korg', 'Japan', 'Известный бренд синтезаторов и музыкального оборудования.'),
+('Martin', 'USA', 'Производитель акустических гитар высокого класса.'),
+('Taylor', 'USA', 'Бренд акустических гитар премиум-класса.'),
+('PRS', 'USA', 'Производитель электрогитар и акустических гитар.'),
+('Epiphone', 'USA', 'Доступные гитары, связанные с брендом Gibson.');
+-- Вставка данных в таблицу Category
+INSERT INTO Category (name, description) VALUES
+('Гитары', 'Акустические и электрогитары.'),
+('Клавишные', 'Синтезаторы, цифровые пианино и MIDI-клавиатуры.'),
+('Ударные', 'Барабаны и перкуссия.'),
+('Струнные', 'Скрипки, виолончели и другие струнные инструменты.'),
+('Духовые', 'Трубы, саксофоны и флейты.'),
+('Аксессуары', 'Чехлы, медиаторы, струны и другие аксессуары.'),
+('Звуковое оборудование', 'Микшеры, усилители и микрофоны.'),
+('Студийное оборудование', 'Аудиоинтерфейсы, мониторы и наушники.'),
+('Электроника', 'Эффекты, процессоры и педали.'),
+('Виниловые проигрыватели', 'Проигрыватели виниловых пластинок.');
+-- Вставка данных в таблицу Warehouse
+INSERT INTO Warehouse (name, telephone, contact_face, address) VALUES
+('Основной склад', '+1234567890', 'Иван Иванов', 'ул. Центральная, 1, Москва'),
+('Склад на юге', '+0987654321', 'Петр Петров', 'ул. Южная, 10, Сочи'),
+('Склад на севере', '+1122334455', 'Сергей Сергеев', 'ул. Северная, 5, Санкт-Петербург'),
+('Склад на востоке', '+5566778899', 'Алексей Алексеев', 'ул. Восточная, 20, Владивосток'),
+('Склад на западе', '+9988776655', 'Дмитрий Дмитриев', 'ул. Западная, 15, Калининград'),
+('Склад в центре', '+1231231234', 'Андрей Андреев', 'ул. Центральная, 30, Екатеринбург'),
+('Склад в Сибири', '+4564564567', 'Николай Николаев', 'ул. Сибирская, 40, Новосибирск'),
+('Склад на Урале', '+7897897890', 'Олег Олегов', 'ул. Уральская, 50, Челябинск'),
+('Склад в Поволжье', '+3213213210', 'Василий Васильев', 'ул. Поволжская, 60, Казань'),
+('Склад на Кавказе', '+6546546540', 'Александр Александров', 'ул. Кавказская, 70, Ростов-на-Дону');
+-- Вставка данных в таблицу Supplier
+INSERT INTO Supplier (name, address, email, phone_number, contact_face) VALUES
+('Музыкальные инструменты ООО', 'ул. Поставщиков, 1, Москва', 'info@musicinstruments.ru', '+1111111111', 'Игорь Игорев'),
+('Гитары и Ко', 'ул. Гитаристов, 2, Санкт-Петербург', 'guitars@mail.ru', '+2222222222', 'Петр Петров'),
+('Клавишные Мир', 'ул. Клавишная, 3, Екатеринбург', 'keys@yandex.ru', '+3333333333', 'Сергей Сергеев'),
+('Ударные Мастер', 'ул. Барабанная, 4, Новосибирск', 'drums@gmail.com', '+4444444444', 'Алексей Алексеев'),
+('Струнные Тон', 'ул. Скрипичная, 5, Казань', 'strings@mail.ru', '+5555555555', 'Дмитрий Дмитриев'),
+('Духовые Звук', 'ул. Духовая, 6, Ростов-на-Дону', 'winds@yandex.ru', '+6666666666', 'Андрей Андреев'),
+('Аксессуары Про', 'ул. Аксессуарная, 7, Сочи', 'accessories@gmail.com', '+7777777777', 'Николай Николаев'),
+('Звук и Свет', 'ул. Звуковая, 8, Владивосток', 'sound@mail.ru', '+8888888888', 'Олег Олегов'),
+('Студия Звука', 'ул. Студийная, 9, Калининград', 'studio@yandex.ru', '+9999999999', 'Василий Васильев'),
+('Электроника Музыки', 'ул. Электронная, 10, Челябинск', 'electronics@gmail.com', '+0000000000', 'Александр Александров');
+-- Вставка данных в таблицу Supply
+INSERT INTO Supply (date, status, warehouse_id, supplier_id) VALUES
+('2023-10-01', 'completed', 1, 1),
+('2023-10-02', 'pending', 2, 2),
+('2023-10-03', 'completed', 3, 3),
+('2023-10-04', 'cancelled', 4, 4),
+('2023-10-05', 'completed', 5, 5),
+('2023-10-06', 'pending', 6, 6),
+('2023-10-07', 'completed', 7, 7),
+('2023-10-08', 'cancelled', 8, 8),
+('2023-10-09', 'completed', 9, 9),
+('2023-10-10', 'pending', 10, 10);
+-- Вставка данных в таблицу Product
+INSERT INTO Product (description, availability, name, date_of_addition, remaining_stock, brand_id, category_id, supply_id, warehouse_id) VALUES
+('Электрогитара Fender Stratocaster', TRUE, 'Fender Stratocaster', '2023-10-01', 5, 1, 1, 1, 1),
+('Акустическая гитара Yamaha FG800', TRUE, 'Yamaha FG800', '2023-10-02', 10, 3, 1, 2, 2),
+('Синтезатор Roland Juno-DS', TRUE, 'Roland Juno-DS', '2023-10-03', 3, 5, 2, 3, 3),
+('Барабанная установка Yamaha DTX402K', TRUE, 'Yamaha DTX402K', '2023-10-04', 2, 3, 3, 4, 4),
+('Скрипка Stentor Student I', TRUE, 'Stentor Student I', '2023-10-05', 7, 7, 4, 5, 5),
+('Саксофон Yamaha YAS-280', TRUE, 'Yamaha YAS-280', '2023-10-06', 4, 3, 5, 6, 6),
+('Чехол для гитары Fender Deluxe', TRUE, 'Fender Deluxe Case', '2023-10-07', 15, 1, 6, 7, 7),
+('Микрофон Shure SM58', TRUE, 'Shure SM58', '2023-10-08', 8, 6, 7, 8, 8),
+('Аудиоинтерфейс Focusrite Scarlett 2i2', TRUE, 'Focusrite Scarlett 2i2', '2023-10-09', 6, 9, 8, 9, 9),
+('Педаль эффектов Boss DS-1', TRUE, 'Boss DS-1', '2023-10-10', 12, 10, 9, 10, 10);
+-- Вставка данных в таблицу Client
+INSERT INTO Client (name, surname, address, telephone, email) VALUES
+('Иван', 'Иванов', 'ул. Пушкина, 10, Москва', '+1111111111', 'ivan@mail.ru'),
+('Петр', 'Петров', 'ул. Лермонтова, 20, Санкт-Петербург', '+2222222222', 'petr@yandex.ru'),
+('Сергей', 'Сергеев', 'ул. Гоголя, 30, Екатеринбург', '+3333333333', 'sergey@gmail.com'),
+('Алексей', 'Алексеев', 'ул. Чехова, 40, Новосибирск', '+4444444444', 'alex@mail.ru'),
+('Дмитрий', 'Дмитриев', 'ул. Толстого, 50, Казань', '+5555555555', 'dmitry@yandex.ru'),
+('Андрей', 'Андреев', 'ул. Достоевского, 60, Ростов-на-Дону', '+6666666666', 'andrey@gmail.com'),
+('Николай', 'Николаев', 'ул. Тургенева, 70, Сочи', '+7777777777', 'nikolay@mail.ru'),
+('Олег', 'Олегов', 'ул. Некрасова, 80, Владивосток', '+8888888888', 'oleg@yandex.ru'),
+('Василий', 'Васильев', 'ул. Блока, 90, Калининград', '+9999999999', 'vasily@gmail.com'),
+('Александр', 'Александров', 'ул. Есенина, 100, Челябинск', '+0000000000', 'alexander@mail.ru');
+-- Вставка данных в таблицу Details
+INSERT INTO Details (price, amount) VALUES
+(50000.00, 1),
+(25000.00, 1),
+(60000.00, 1),
+(40000.00, 1),
+(15000.00, 1),
+(30000.00, 1),
+(5000.00, 1),
+(10000.00, 1),
+(20000.00, 1),
+(8000.00, 1);
+-- Вставка данных в таблицу OrderTable
+INSERT INTO OrderTable (date, total, status, client_id, details_id, product_id) VALUES
+('2023-10-01', 50000.00, 'delivered', 1, 1, 1),
+('2023-10-02', 25000.00, 'shipped', 2, 2, 2),
+('2023-10-03', 60000.00, 'pending', 3, 3, 3),
+('2023-10-04', 40000.00, 'cancelled', 4, 4, 4),
+('2023-10-05', 15000.00, 'delivered', 5, 5, 5),
+('2023-10-06', 30000.00, 'shipped', 6, 6, 6),
+('2023-10-07', 5000.00, 'pending', 7, 7, 7),
+('2023-10-08', 10000.00, 'cancelled', 8, 8, 8),
+('2023-10-09', 20000.00, 'delivered', 9, 9, 9),
+('2023-10-10', 8000.00, 'shipped', 10, 10, 10);
